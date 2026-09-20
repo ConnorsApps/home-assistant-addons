@@ -1,0 +1,67 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/ConnorsApps/frigate-notifications/main/config.schema.json
+
+# Rules, recipients and cameras for Frigate Notifications. Documentation:
+# https://github.com/ConnorsApps/frigate-notifications
+#
+# Not set here, because the app supplies them:
+#   hass:   Home Assistant, reached through the Supervisor.
+#   mqtt:   the broker from Home Assistant's MQTT service (Mosquitto). Add an
+#           `mqtt:` block here (broker, username, password, topicPrefix) to use
+#           a different one.
+#   media:  set frigate_url and public_base_url in the app's Configuration tab.
+#           The signing key is generated for you.
+#   slack, ntfy, redis, db: optional; also settable in the Configuration tab,
+#           where a value overrides this file.
+
+timezone: America/New_York
+dashboardPath: /lovelace/frigate # opened when a Home Assistant app notification is tapped
+# Slack, ntfy and Discord can't resolve a relative path, so they get an absolute link.
+dashboardURL: https://homeassistant.example.com/lovelace/frigate
+# Set to true to log every notification instead of sending it.
+dryRun: false
+
+# A recipient is a person, reached on one or more targets. Policy (allowCritical,
+# activeHours, maxPerHour) applies once per recipient, then every target gets it.
+recipients:
+  alice:
+    targets:
+      - { type: hass, service: mobile_app_alice_phone } # bare suffix of notify.<service>
+      # - { type: slack, channel: U0123ABCD } # a channel id, or a user id to DM
+      # - { type: ntfy, topic: alice-frigate }
+      # - { type: discord, webhookURL: 'https://discord.com/api/webhooks/000000/example' }
+    allowCritical: true
+    maxPerHour: 8
+    # Awake window: outside it, only critical notifications get through.
+    activeHours: { from: 7am, to: 10pm }
+
+cameras:
+  front_porch:
+    friendlyName: Front Porch
+    liveViewEntity: camera.front_porch
+
+# Ordered: the first matching rule wins, and position is priority.
+rules:
+  - name: night-person
+    when:
+      # Solar, not wall-clock: a fixed 23:00-06:00 window leaves hours of
+      # December darkness uncovered.
+      hours: { from: dusk+30m, to: dawn-30m }
+      labels: [person]
+      severity: [alert]
+    holdoff: 5s
+    cooldown: 5m
+    cooldownScope: rule
+    to: [alice]
+    preset: liveview
+    critical: true
+
+  - name: day
+    when:
+      hours: { from: dawn-30m, to: dusk+30m }
+      labels: [person, dog, package]
+      severity: [alert]
+    cooldown: 30s
+    cooldownScope: rule
+    to: [alice]
+
+logLevel: info

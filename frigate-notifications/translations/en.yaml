@@ -1,0 +1,37 @@
+configuration:
+  frigate_url:
+    name: Frigate URL
+    description: >-
+      Where this app reaches Frigate's unauthenticated API (port 5000) to fetch
+      snapshots and clips, e.g. http://ccab4aaf-frigate:5000. Media needs this,
+      the public URL, and a signing key; without them notifications are text only.
+  public_base_url:
+    name: Public URL for media
+    description: >-
+      The address phones use to reach port 8081 of this app from anywhere, e.g.
+      https://frigate-notifications.example.com.
+  media_signing_key:
+    name: Media signing key
+    description: >-
+      Hex key (at least 32 characters) that signs media links. Leave empty to use
+      a key generated on first start. Changing it invalidates every link already
+      sent.
+  slack_bot_token:
+    name: Slack bot token
+    description: Bot token (xoxb-...) with chat:write. Overrides slack.botToken in config.yaml.
+  ntfy_url:
+    name: ntfy server URL
+    description: Overrides ntfy.url in config.yaml. Needs ntfy 2.16 or newer to update notifications in place.
+  ntfy_token:
+    name: ntfy access token
+    description: Overrides ntfy.token in config.yaml. Leave empty for open topics.
+  db_url:
+    name: Database URL
+    description: >-
+      postgres:// or mongodb:// URL for the notification audit log. Overrides
+      db.url in config.yaml.
+  redis_url:
+    name: Redis URL
+    description: >-
+      redis:// URL that keeps cooldowns and per-review state across restarts.
+      Overrides redis.url in config.yaml.

@@ -1,0 +1,47 @@
+name: Lint
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  yaml:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: yamllint
+        run: pipx run yamllint .
+
+  # Validates each config.yaml against the Supervisor's schema.
+  addon:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [hass-backup, frigate-notifications]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: frenck/action-addon-linter@v2
+        with:
+          path: ./${{ matrix.app }}
+
+  shell:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: shellcheck
+        run: shellcheck -x --severity=warning */run.sh
+
+  # Builds each app's image from the upstream release it pins, so a missing
+  # upstream tag or a broken COPY fails here rather than after the merge.
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [hass-backup, frigate-notifications]
+    steps:
+      - uses: actions/checkout@v7
+      - name: docker build
+        run: docker build ${{ matrix.app }}

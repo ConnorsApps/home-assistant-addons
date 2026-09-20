@@ -1,0 +1,73 @@
+name: Publish
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - hass-backup/**
+      - frigate-notifications/**
+      - .github/workflows/publish.yml
+  workflow_dispatch:
+
+# Home Assistant pulls `image:` at the app's `version`, so every version is
+# published once and never rewritten: bump `version` in the app's config.yaml
+# to release a change.
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [hass-backup, frigate-notifications]
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Read image and version
+        id: app
+        run: |
+          image=$(sed -n 's/^image: *//p' "${{ matrix.app }}/config.yaml" | head -1)
+          version=$(sed -n 's/^version: *"\{0,1\}\([^"]*\)"\{0,1\} *$/\1/p' "${{ matrix.app }}/config.yaml" | head -1)
+          if [ -z "$image" ] || [ -z "$version" ]; then
+            echo "could not read image and version from ${{ matrix.app }}/config.yaml" >&2
+            exit 1
+          fi
+          echo "image=$image" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Check whether this version is already published
+        id: exists
+        run: |
+          if docker buildx imagetools inspect "${{ steps.app.outputs.image }}:${{ steps.app.outputs.version }}" > /dev/null 2>&1; then
+            echo "published=true" >> "$GITHUB_OUTPUT"
+            echo "${{ steps.app.outputs.image }}:${{ steps.app.outputs.version }} already exists; bump version to publish a change."
+          else
+            echo "published=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      # The Dockerfiles only COPY, so building the arm64 image needs no emulation.
+      - name: Build and push
+        if: steps.exists.outputs.published == 'false'
+        uses: docker/build-push-action@v7
+        with:
+          context: ${{ matrix.app }}
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: ${{ steps.app.outputs.image }}:${{ steps.app.outputs.version }}
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.version=${{ steps.app.outputs.version }}
+          cache-from: type=gha,scope=${{ matrix.app }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.app }}

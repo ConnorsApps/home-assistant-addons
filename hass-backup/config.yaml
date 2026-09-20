@@ -1,0 +1,42 @@
+name: Home Assistant Backup
+version: "0.1.0"
+slug: hass_backup
+description: Back up Home Assistant to S3-compatible storage, Google Cloud Storage, or a local folder on a schedule
+url: https://github.com/ConnorsApps/home-assistant-backup
+image: ghcr.io/connorsapps/ha-addon-hass-backup
+arch:
+  - aarch64
+  - amd64
+# The base image runs s6-overlay as its own init; the Supervisor's init must be off.
+init: false
+startup: application
+boot: auto
+# Creating, downloading and deleting a backup are Supervisor API calls
+# (/backups/*), which the backup role allows and the Core API proxy does not.
+hassio_api: true
+hassio_role: backup
+map:
+  - type: share
+    read_only: false
+  - type: addon_config
+    read_only: true
+    path: /config
+options:
+  schedule: "0 3 * * *"
+  storage_url: "file:///share/hass-backups"
+  storage_prefix: "home-assistant/"
+  retention_keep_last: 30
+  delete_after_transfer: true
+  log_level: info
+schema:
+  schedule: str
+  storage_url: str
+  storage_prefix: str
+  retention_keep_last: int(0,)
+  delete_after_transfer: bool
+  log_level: list(debug|info|warn|error)
+  aws_endpoint_url: str?
+  aws_region: str?
+  aws_access_key_id: str?
+  aws_secret_access_key: password?
+  google_credentials_file: str?
