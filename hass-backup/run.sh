@@ -1,58 +1,35 @@
 #!/usr/bin/with-contenv bashio
-# shellcheck shell=bash
-# shellcheck disable=SC2155 # exporting straight from $(bashio::...) is the norm here; the app validates what it is given
+# shellcheck shell=bash disable=SC2155
 set -e
 
-# hass-backup reads its settings from the environment; this maps the app's
-# options onto it. Home Assistant itself is reached through the Supervisor,
-# which needs no URL or token to be configured.
-export HASS_MODE=supervisor
+# Export VAR from an option, if set.
+opt() { if bashio::config.has_value "$2"; then export "$1=$(bashio::config "$2")"; fi; }
 
-export SCHEDULE="$(bashio::config 'schedule')"
-export STORAGE_URL="$(bashio::config 'storage_url')"
-export STORAGE_PREFIX="$(bashio::config 'storage_prefix')"
-export RETENTION_KEEP_LAST="$(bashio::config 'retention_keep_last')"
-export HASS_DELETE_AFTER_TRANSFER="$(bashio::config 'delete_after_transfer')"
-export HASS_TIMEOUT="$(bashio::config 'timeout')"
-export LOG_LEVEL="$(bashio::config 'log_level')"
-export LOG_FORMAT=text
+export HASS_MODE=supervisor LOG_FORMAT=text
+opt SCHEDULE schedule
+opt STORAGE_URL storage_url
+opt STORAGE_PREFIX storage_prefix
+opt RETENTION_KEEP_LAST retention_keep_last
+opt HASS_DELETE_AFTER_TRANSFER delete_after_transfer
+opt HASS_TIMEOUT timeout
+opt LOG_LEVEL log_level
+opt AWS_ENDPOINT_URL aws_endpoint_url
+opt AWS_REGION aws_region
+opt AWS_ACCESS_KEY_ID aws_access_key_id
+opt AWS_SECRET_ACCESS_KEY aws_secret_access_key
 
-# The schedule is read in the container's time zone.
-# Without it the schedule falls back to UTC, which is worth a warning, not a stop.
-if [ -z "${TZ:-}" ]; then
-    TZ="$(bashio::info.timezone || true)"
-fi
-if [ -z "${TZ}" ]; then
-    bashio::log.warning "Could not read Home Assistant's time zone; the schedule will run in UTC."
-fi
-export TZ
+export TZ="${TZ:-$(bashio::info.timezone || true)}"
+[ -n "${TZ}" ] || bashio::log.warning "Could not read Home Assistant's time zone; using UTC."
 
-if bashio::config.has_value 'aws_endpoint_url'; then
-    export AWS_ENDPOINT_URL="$(bashio::config 'aws_endpoint_url')"
-fi
-if bashio::config.has_value 'aws_region'; then
-    export AWS_REGION="$(bashio::config 'aws_region')"
-fi
-if bashio::config.has_value 'aws_access_key_id'; then
-    export AWS_ACCESS_KEY_ID="$(bashio::config 'aws_access_key_id')"
-fi
-if bashio::config.has_value 'aws_secret_access_key'; then
-    export AWS_SECRET_ACCESS_KEY="$(bashio::config 'aws_secret_access_key')"
-fi
-
-# A relative name is a file in the app's config folder, /addon_configs/<id>_hass_backup/.
-if bashio::config.has_value 'google_credentials_file'; then
-    credentials="$(bashio::config 'google_credentials_file')"
-    case "${credentials}" in
-        /*) ;;
-        *) credentials="/config/${credentials}" ;;
-    esac
-    if ! bashio::fs.file_exists "${credentials}"; then
+# A relative name is a file in the app's config folder.
+if bashio::config.has_value google_credentials_file; then
+    credentials="$(bashio::config google_credentials_file)"
+    case "${credentials}" in /*) ;; *) credentials="/config/${credentials}" ;; esac
+    bashio::fs.file_exists "${credentials}" || {
         bashio::log.fatal "google_credentials_file ${credentials} does not exist."
         bashio::exit.nok
-    fi
+    }
     export GOOGLE_APPLICATION_CREDENTIALS="${credentials}"
 fi
 
-bashio::log.info "Starting hass-backup: schedule '${SCHEDULE}', storage '${STORAGE_URL}'."
 exec hass-backup

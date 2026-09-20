@@ -13,7 +13,6 @@ jobs:
       - name: yamllint
         run: pipx run yamllint .
 
-  # Validates each config.yaml against the Supervisor's schema.
   addon:
     runs-on: ubuntu-latest
     strategy:
@@ -33,8 +32,7 @@ jobs:
       - name: shellcheck
         run: shellcheck -x --severity=warning */run.sh
 
-  # Builds each app's image from the upstream release it pins, so a missing
-  # upstream tag or a broken COPY fails here rather than after the merge.
+  # Fails on a missing upstream tag or a broken COPY.
   build:
     runs-on: ubuntu-latest
     strategy:

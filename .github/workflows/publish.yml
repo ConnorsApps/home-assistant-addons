@@ -9,9 +9,7 @@ on:
       - .github/workflows/publish.yml
   workflow_dispatch:
 
-# Home Assistant pulls `image:` at the app's `version`, so every version is
-# published once and never rewritten: bump `version` in the app's config.yaml
-# to release a change.
+# Each version is published once; bump `version` to release a change.
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -51,8 +49,7 @@ jobs:
         id: exists
         run: |
           ref="${{ steps.app.outputs.image }}:${{ steps.app.outputs.version }}"
-          # Only a definite "not found" means unpublished. A registry or auth
-          # error must fail the job, not fall through to overwriting a version.
+          # Only "not found" means unpublished; other errors must not overwrite.
           if out=$(docker buildx imagetools inspect "$ref" 2>&1); then
             echo "published=true" >> "$GITHUB_OUTPUT"
             echo "$ref already exists; bump version to publish a change."
@@ -64,7 +61,6 @@ jobs:
             exit 1
           fi
 
-      # The Dockerfiles only COPY, so building the arm64 image needs no emulation.
       - name: Build and push
         if: steps.exists.outputs.published == 'false'
         uses: docker/build-push-action@v7

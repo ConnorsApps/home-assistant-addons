@@ -1,7 +1,4 @@
-# The app is the published hass-backup binary (built with every storage driver)
-# dropped into the Home Assistant base image, which brings s6-overlay and bashio
-# for reading the app's options. Bump SOURCE_VERSION together with `version` in
-# config.yaml when taking a new hass-backup release.
+# Bump SOURCE_VERSION with `version` in config.yaml.
 ARG SOURCE_VERSION=0.2.0
 
 FROM ghcr.io/connorsapps/home-assistant-backup:${SOURCE_VERSION}-all AS source

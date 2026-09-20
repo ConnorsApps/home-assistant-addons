@@ -1,7 +1,4 @@
-# The app is the published frigate-notifications binary dropped into the Home
-# Assistant base image, which brings s6-overlay and bashio for reading the app's
-# options and the MQTT service. Bump SOURCE_VERSION together with `version` in
-# config.yaml when taking a new frigate-notifications release.
+# Bump SOURCE_VERSION with `version` in config.yaml.
 ARG SOURCE_VERSION=0.1.0
 
 FROM ghcr.io/connorsapps/frigate-notifications:${SOURCE_VERSION} AS source

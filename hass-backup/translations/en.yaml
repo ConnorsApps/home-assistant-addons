@@ -1,48 +1,37 @@
 configuration:
   schedule:
     name: Schedule
-    description: >-
-      Cron expression for when to back up, in Home Assistant's time zone (for
-      example "0 3 * * *" for 03:00 daily). Empty runs one backup each time the
-      app starts, then stops.
+    description: Cron expression, e.g. "0 3 * * *" for 03:00 daily. Empty runs one backup per app start.
   storage_url:
     name: Storage URL
-    description: >-
-      Where backups are uploaded: file:///share/hass-backups, s3://bucket, or
-      gs://bucket. For S3-compatible stores that need path-style addressing,
-      append ?use_path_style=true.
+    description: file:///share/hass-backups, s3://bucket, or gs://bucket. Add ?use_path_style=true for MinIO or Ceph.
   storage_prefix:
     name: Storage prefix
-    description: Prefix for every uploaded object, e.g. "home-assistant/".
+    description: Prefix on every uploaded file.
   retention_keep_last:
     name: Backups to keep
-    description: Delete the oldest uploaded backups beyond this count. 0 keeps everything.
+    description: Delete older uploads beyond this count. 0 keeps everything.
   delete_after_transfer:
     name: Delete from Home Assistant after upload
-    description: Remove the backup from Home Assistant once it is safely in storage.
+    description: Remove the backup from Home Assistant once uploaded.
   timeout:
     name: Timeout
-    description: >-
-      How long creating the backup may take, and separately how long downloading
-      and uploading it may take (for example "30m" or "1h30m"). Raise it for a
-      large installation or a slow connection.
+    description: Limit for creating, and separately for downloading and uploading (e.g. "30m", "1h30m").
   log_level:
     name: Log level
-    description: Verbosity of the app's log.
+    description: Log verbosity.
   aws_endpoint_url:
     name: S3 endpoint URL
-    description: Endpoint of an S3-compatible service such as MinIO or Ceph. Leave empty for AWS.
+    description: For S3-compatible services such as MinIO. Empty for AWS.
   aws_region:
     name: S3 region
-    description: Region for S3 requests, e.g. us-east-1.
+    description: e.g. us-east-1.
   aws_access_key_id:
     name: S3 access key ID
-    description: Access key for S3 storage.
+    description: Access key for S3.
   aws_secret_access_key:
     name: S3 secret access key
-    description: Secret key for S3 storage.
+    description: Secret key for S3.
   google_credentials_file:
     name: Google credentials file
-    description: >-
-      Service account key JSON for gs:// storage. A name like "gcs.json" is read
-      from the app's config folder, /addon_configs/<repository>_hass_backup/.
+    description: Service account key JSON for gs://, in the app's config folder (e.g. "gcs.json").

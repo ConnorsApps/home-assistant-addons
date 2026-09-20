@@ -1,32 +1,23 @@
 name: Frigate Notifications
 version: "0.1.0"
 slug: frigate_notifications
-description: Rule-based Frigate notifications to phones through Home Assistant, Slack, ntfy, and Discord
+description: Rule-based Frigate notifications via Home Assistant, Slack, ntfy, and Discord
 url: https://github.com/ConnorsApps/frigate-notifications
 image: ghcr.io/connorsapps/ha-addon-frigate-notifications
 arch:
   - aarch64
   - amd64
-# The base image runs s6-overlay as its own init; the Supervisor's init must be off.
-init: false
+init: false # the base image's s6-overlay is the init
 startup: application
 boot: auto
-# Notifications go out as Home Assistant notify services, and rules read entity
-# state and sun.sun, all through the Core API proxy.
 homeassistant_api: true
-# Frigate publishes reviews to MQTT; the broker's address and credentials come
-# from the Supervisor when a broker app (Mosquitto) is installed. `want` rather
-# than `need`, so an external broker can be set in config.yaml instead.
 services:
-  - mqtt:want
-# Phones off the home network open snapshots and clips through this port, so it
-# has to be reachable from outside (ingress is behind a Home Assistant login and
-# can't serve them). Put a reverse proxy or tunnel in front and set
-# public_base_url to its address.
+  - mqtt:want # an external broker can be set in config.yaml instead
+# Media links must open off the LAN without a Home Assistant login, so not ingress.
 ports:
   8081/tcp: 8081
 ports_description:
-  8081/tcp: Signed media links for snapshots and clips (serve it through your reverse proxy or tunnel)
+  8081/tcp: Signed media links (put a reverse proxy or tunnel in front)
 map:
   - type: addon_config
     read_only: false
