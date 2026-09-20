@@ -8,8 +8,6 @@ arch:
   - aarch64
   - amd64
 init: false # the base image's s6-overlay is the init
-startup: application
-boot: auto
 # The Supervisor's /backups API; the Core proxy blocks the download path.
 hassio_api: true
 hassio_role: backup
