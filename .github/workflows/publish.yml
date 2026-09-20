@@ -50,11 +50,18 @@ jobs:
       - name: Check whether this version is already published
         id: exists
         run: |
-          if docker buildx imagetools inspect "${{ steps.app.outputs.image }}:${{ steps.app.outputs.version }}" > /dev/null 2>&1; then
+          ref="${{ steps.app.outputs.image }}:${{ steps.app.outputs.version }}"
+          # Only a definite "not found" means unpublished. A registry or auth
+          # error must fail the job, not fall through to overwriting a version.
+          if out=$(docker buildx imagetools inspect "$ref" 2>&1); then
             echo "published=true" >> "$GITHUB_OUTPUT"
-            echo "${{ steps.app.outputs.image }}:${{ steps.app.outputs.version }} already exists; bump version to publish a change."
-          else
+            echo "$ref already exists; bump version to publish a change."
+          elif grep -qiE 'not found|no such manifest|manifest unknown' <<< "$out"; then
             echo "published=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "could not check $ref:" >&2
+            echo "$out" >&2
+            exit 1
           fi
 
       # The Dockerfiles only COPY, so building the arm64 image needs no emulation.

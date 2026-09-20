@@ -57,7 +57,7 @@ if bashio::config.has_value 'media_signing_key'; then
     MEDIA_SIGNING_KEY="$(bashio::config 'media_signing_key')"
 else
     key_file=/data/signing_key
-    if ! bashio::fs.file_exists "${key_file}"; then
+    if ! bashio::fs.file_non_empty "${key_file}"; then
         (umask 077 && od -An -tx1 -N32 /dev/urandom | tr -d ' \n' > "${key_file}")
     fi
     MEDIA_SIGNING_KEY="$(cat "${key_file}")"

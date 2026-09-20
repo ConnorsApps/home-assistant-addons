@@ -27,6 +27,7 @@ options:
   storage_prefix: "home-assistant/"
   retention_keep_last: 30
   delete_after_transfer: true
+  timeout: "30m"
   log_level: info
 schema:
   schedule: str
@@ -34,6 +35,7 @@ schema:
   storage_prefix: str
   retention_keep_last: int(0,)
   delete_after_transfer: bool
+  timeout: str
   log_level: list(debug|info|warn|error)
   aws_endpoint_url: str?
   aws_region: str?

@@ -13,12 +13,17 @@ export STORAGE_URL="$(bashio::config 'storage_url')"
 export STORAGE_PREFIX="$(bashio::config 'storage_prefix')"
 export RETENTION_KEEP_LAST="$(bashio::config 'retention_keep_last')"
 export HASS_DELETE_AFTER_TRANSFER="$(bashio::config 'delete_after_transfer')"
+export HASS_TIMEOUT="$(bashio::config 'timeout')"
 export LOG_LEVEL="$(bashio::config 'log_level')"
 export LOG_FORMAT=text
 
 # The schedule is read in the container's time zone.
+# Without it the schedule falls back to UTC, which is worth a warning, not a stop.
 if [ -z "${TZ:-}" ]; then
-    TZ="$(bashio::info.timezone)"
+    TZ="$(bashio::info.timezone || true)"
+fi
+if [ -z "${TZ}" ]; then
+    bashio::log.warning "Could not read Home Assistant's time zone; the schedule will run in UTC."
 fi
 export TZ
 

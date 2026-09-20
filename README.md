@@ -11,9 +11,11 @@ Apps (add-ons) for Home Assistant OS and Supervised installations. Home Assistan
 
 ## Install
 
-1. In Home Assistant open **Settings → Add-ons → Add-on store**, then **⋮ → Repositories**.
+1. In Home Assistant open **Settings → Apps**, select **Install app**, then **⋮ → Repositories**.
 2. Add `https://github.com/ConnorsApps/home-assistant-addons` (or use the button above).
 3. Install an app from the **ConnorsApps Home Assistant Apps** section and read its **Documentation** tab.
+
+Older Home Assistant versions call these add-ons and the store the add-on store.
 
 ## How this repository works
 

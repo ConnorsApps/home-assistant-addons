@@ -20,6 +20,12 @@ configuration:
   delete_after_transfer:
     name: Delete from Home Assistant after upload
     description: Remove the backup from Home Assistant once it is safely in storage.
+  timeout:
+    name: Timeout
+    description: >-
+      How long creating the backup may take, and separately how long downloading
+      and uploading it may take (for example "30m" or "1h30m"). Raise it for a
+      large installation or a slow connection.
   log_level:
     name: Log level
     description: Verbosity of the app's log.

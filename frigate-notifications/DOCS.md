@@ -18,7 +18,7 @@ Everything here is optional, and a value set here wins over the same setting in 
 
 | Option | Description |
 |---|---|
-| `frigate_url` | Where the app reaches Frigate's unauthenticated API (port 5000), e.g. `http://ccab4aaf-frigate:5000` for the Frigate app. Media needs this, `public_base_url`, and the signing key. |
+| `frigate_url` | Where the app reaches Frigate's unauthenticated API (port 5000), e.g. `http://<frigate app hostname>:5000` for the Frigate app (its hostname is on the app's Info page, or use your Frigate server's address). Media needs this, `public_base_url`, and the signing key. |
 | `public_base_url` | The address phones use to reach this app's port 8081, e.g. `https://frigate-notifications.example.com`. |
 | `media_signing_key` | Hex string of 32 or more characters that signs media links. Left empty, a key is generated on first start and kept. Changing it invalidates links already sent. |
 | `slack_bot_token` | Slack bot token (`xoxb-...`) with `chat:write`. |

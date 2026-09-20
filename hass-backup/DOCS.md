@@ -13,6 +13,7 @@ The app asks the Supervisor for the backup, so it needs no access token. It is t
 | `storage_prefix` | `home-assistant/` | Prefix on every uploaded file. Retention only counts files under it. |
 | `retention_keep_last` | `30` | Keep this many uploads and delete older ones. `0` keeps everything. |
 | `delete_after_transfer` | on | Remove the backup from Home Assistant once it is uploaded. |
+| `timeout` | `30m` | Time limit for creating the backup, and separately for downloading and uploading it (`30m`, `1h30m`). Raise it for a large installation or a slow uplink. |
 | `log_level` | `info` | `debug`, `info`, `warn`, or `error`. |
 
 Uploaded files are named `<prefix><UTC timestamp>-<slug>.tar`.
@@ -36,5 +37,5 @@ Set `storage_url` to `gs://my-bucket`, put a service account key JSON in the app
 ## Notes
 
 - Backups run one at a time, and a failed run (Home Assistant restarting, storage unreachable) is logged and retried at the next tick, not fatal.
-- Large installations take minutes to back up; each step is limited to 10 minutes.
+- If a run fails after Home Assistant has made the backup (the upload failed, say), the backup is left in Home Assistant, since it may be the only copy. The log names its slug. Repeated failures leave one each; delete them under **Settings → System → Backups** once the cause is fixed.
 - Home Assistant may take its own automatic backups too. This app only deletes the backups it creates.

@@ -3,7 +3,7 @@ configuration:
     name: Frigate URL
     description: >-
       Where this app reaches Frigate's unauthenticated API (port 5000) to fetch
-      snapshots and clips, e.g. http://ccab4aaf-frigate:5000. Media needs this,
+      snapshots and clips, e.g. http://<frigate app hostname>:5000. Media needs this,
       the public URL, and a signing key; without them notifications are text only.
   public_base_url:
     name: Public URL for media
