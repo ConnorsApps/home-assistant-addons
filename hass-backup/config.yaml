@@ -1,5 +1,5 @@
 name: Home Assistant Backup
-version: "0.1.1"
+version: "0.1.2"
 slug: hass_backup
 description: Scheduled backups to S3-compatible storage, Google Cloud Storage, or a local folder
 url: https://github.com/ConnorsApps/home-assistant-backup
