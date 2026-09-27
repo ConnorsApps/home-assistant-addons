@@ -2,10 +2,11 @@
 
 # https://github.com/ConnorsApps/frigate-notifications
 # Set by the app, not here: hass, mqtt (add an `mqtt:` block to use another
-# broker), and media (Configuration tab). slack, ntfy, redis and db can be set
-# here or in the Configuration tab, which wins.
+# broker instead of the Mosquitto app), and media (Configuration tab). slack,
+# ntfy, redis and db can be set here or in the Configuration tab, which wins.
+# Hours and dusk/dawn follow Home Assistant's time zone; add `timezone:` only to
+# override it.
 
-timezone: America/New_York
 dashboardPath: /lovelace/frigate # opened when a Home Assistant notification is tapped
 dashboardURL: https://homeassistant.example.com/lovelace/frigate # for Slack, ntfy, Discord
 dryRun: false
@@ -21,6 +22,7 @@ recipients:
     maxPerHour: 8
     activeHours: { from: 7am, to: 10pm } # outside it, only critical gets through
 
+# Only cameras listed here notify; keys are Frigate camera names.
 cameras:
   front_porch:
     friendlyName: Front Porch

@@ -26,7 +26,7 @@ aws_region: us-east-1
 
 ## Google Cloud Storage
 
-Set `storage_url: gs://my-bucket`, put a service account key in the app's config folder (`/addon_configs/<repository>_hass_backup/gcs.json`), and set `google_credentials_file: gcs.json`.
+Set `storage_url: gs://my-bucket`, put a service account key in the app's config folder (`/addon_configs/38cd5911_hass_backup/gcs.json`), and set `google_credentials_file: gcs.json`.
 
 ## Failures
 
