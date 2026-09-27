@@ -1,0 +1,65 @@
+name: Update
+
+on:
+  schedule:
+    - cron: "23 7 * * *"
+  # Also started by frigate-notifications and home-assistant-backup releases.
+  workflow_dispatch:
+    inputs:
+      app:
+        description: App folder to check; empty checks every app
+        required: false
+        type: string
+
+concurrency:
+  group: update
+
+# Bumps each app whose upstream has a newer release, commits to main and
+# publishes. On any other branch it is a dry run that prints the change.
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Bump apps with a newer upstream release
+        id: bump
+        env:
+          APP: ${{ inputs.app }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          found=false
+          for config in */config.yaml; do
+            app=${config%/config.yaml}
+            [ -z "${APP}" ] || [ "${APP}" = "${app}" ] || continue
+            found=true
+            msg=$(.github/scripts/update-app.sh "${app}")
+            [ -n "${msg}" ] || continue
+            # Fails on a missing upstream tag or a broken COPY, as in Lint.
+            docker build -q "${app}" > /dev/null
+            git commit -qam "${msg}"
+            echo "- ${msg}" >> "${GITHUB_STEP_SUMMARY}"
+          done
+          if ! ${found}; then
+            echo "no app named '${APP}'" >&2
+            exit 1
+          fi
+          if [ "$(git rev-parse HEAD)" != "${GITHUB_SHA}" ]; then
+            git log -p --format='%n%s' "${GITHUB_SHA}..HEAD"
+            echo "changed=true" >> "${GITHUB_OUTPUT}"
+          fi
+
+      - name: Push to main and publish
+        if: steps.bump.outputs.changed == 'true' && github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git pull -q --rebase origin main
+          git push -q origin HEAD:main
+          # A push with this token starts no workflows, so start them here.
+          gh workflow run publish.yml --repo "${GITHUB_REPOSITORY}" --ref main
+          gh workflow run lint.yml --repo "${GITHUB_REPOSITORY}" --ref main
