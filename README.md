@@ -15,6 +15,8 @@ Apps for Home Assistant OS and Supervised.
 
 ## Maintaining
 
-Each app is an upstream binary (`SOURCE_VERSION` in its Dockerfile) in the Home Assistant base image; `run.sh` maps options to env. `version` in `config.yaml` is the tag of `ghcr.io/connorsapps/ha-addon-<slug>`. Bump it with `SOURCE_VERSION`; merging to `main` publishes each version once.
+Each app is an upstream binary (`SOURCE_VERSION` in its Dockerfile) in the Home Assistant base image; `run.sh` maps options to env. `version` in `config.yaml` is the tag of `ghcr.io/connorsapps/ha-addon-<slug>`; merging to `main` publishes each version once, so bump it with any change.
+
+Upstream releases are picked up by the Update workflow: daily, from **Run workflow**, or right away when frigate-notifications or home-assistant-backup tags a release. It bumps `SOURCE_VERSION`, `version` and the changelog, builds, commits to `main` and runs Publish. Run on another branch, it only prints the change.
 
 To test on a real instance, copy an app to `/addons/local/<slug>` without its `image:` line.
