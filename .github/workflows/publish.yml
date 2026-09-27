@@ -70,6 +70,8 @@ jobs:
           platforms: linux/amd64,linux/arm64
           tags: ${{ steps.app.outputs.image }}:${{ steps.app.outputs.version }}
           labels: |
+            io.hass.type=app
+            io.hass.version=${{ steps.app.outputs.version }}
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
             org.opencontainers.image.version=${{ steps.app.outputs.version }}
           cache-from: type=gha,scope=${{ matrix.app }}
