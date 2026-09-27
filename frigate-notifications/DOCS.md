@@ -5,10 +5,12 @@ Turns Frigate's MQTT review stream into notifications with ordered rules, per-pe
 ## Setup
 
 1. Start the app. With no config it writes an example and stops.
-2. Edit `config.yaml` in the app's config folder, `/addon_configs/<repository>_frigate_notifications/` (Samba, SSH, or Studio Code Server): recipients, cameras, rules.
+2. Edit `config.yaml` in the app's config folder, `/addon_configs/38cd5911_frigate_notifications/` (Samba, SSH, or Studio Code Server): recipients, cameras, rules.
 3. Start the app. A bad rule is reported by name.
 
-Home Assistant and the MQTT broker (Mosquitto) are configured for you. For another broker, add an `mqtt:` block to `config.yaml`. A `hass` target's `service` is the part after `notify.`.
+`38cd5911` is this repository's ID when added from the README's link; the app's page shows its hostname if yours differs.
+
+Home Assistant and the Mosquitto broker app are configured for you. For another broker, add an `mqtt:` block to `config.yaml`; it replaces Mosquitto entirely. A `hass` target's `service` is the part after `notify.`. Hours and dusk/dawn use Home Assistant's time zone and `sun.sun` unless `config.yaml` sets `timezone`.
 
 ## Options
 
@@ -16,7 +18,7 @@ All optional. A value here beats the same setting in `config.yaml`.
 
 | Option | |
 |---|---|
-| `frigate_url` | Frigate's unauthenticated API, e.g. `http://<frigate app hostname>:5000` |
+| `frigate_url` | Frigate's unauthenticated API: `http://ccab4aaf-frigate:5000` for the Frigate app (`ccab4aaf-frigate-fa` for Full Access), else `http://<host>:5000` |
 | `public_base_url` | Address phones use to reach port 8081, e.g. `https://frigate-notifications.example.com` |
 | `media_signing_key` | Hex, 32+ chars. Empty: generated once and kept. Changing it breaks links already sent. |
 | `slack_bot_token` | `xoxb-...` with `chat:write` |
@@ -26,7 +28,7 @@ All optional. A value here beats the same setting in `config.yaml`.
 
 ## Media off the LAN
 
-Notifications link to a signed proxy on port **8081**, since phones can't reach Frigate directly. Ingress can't serve it (it needs a Home Assistant login), so put a reverse proxy or tunnel in front of `<host>:8081` and set `public_base_url`. Media also needs `frigate_url`; without them notifications are text only.
+Notifications link to a signed proxy on port **8081**, since phones can't reach Frigate directly. Ingress can't serve it (it needs a Home Assistant login), so put a reverse proxy or tunnel in front of `<host>:8081` (from another app such as NGINX Proxy Manager or Cloudflared: `http://38cd5911-frigate-notifications:8081`) and set `public_base_url`. Media also needs `frigate_url`; without them notifications are text only.
 
 ## Restarts
 

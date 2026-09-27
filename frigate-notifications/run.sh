@@ -15,18 +15,23 @@ fi
 
 export HASS_URL=http://supervisor/core HASS_TOKEN="${SUPERVISOR_TOKEN}"
 
-# No MQTT service is normal (external broker), but bashio logs it as an error.
-bashio::log.level fatal
-bashio::services.available mqtt && mqtt=true || mqtt=false
-bashio::log.level info
-if ${mqtt}; then
+# An mqtt: block in config.yaml is another broker; otherwise use the Mosquitto app.
+if grep -q '^mqtt:' "${CONFIG_PATH}"; then
+    bashio::log.info "Using the mqtt: broker from config.yaml."
+else
+    # bashio logs a missing service as an error; the message below says it better.
+    bashio::log.level fatal
+    bashio::services.available mqtt && mqtt=true || mqtt=false
+    bashio::log.level info
+    if ! ${mqtt}; then
+        bashio::log.fatal "No MQTT broker: install the Mosquitto broker app, or add an mqtt: block to config.yaml."
+        bashio::exit.nok
+    fi
     scheme=tcp
     [ "$(bashio::services mqtt ssl)" = true ] && scheme=ssl
     export MQTT_BROKER="${scheme}://$(bashio::services mqtt host):$(bashio::services mqtt port)"
     export MQTT_USERNAME="$(bashio::services mqtt username)"
     export MQTT_PASSWORD="$(bashio::services mqtt password)"
-else
-    bashio::log.info "No MQTT service; using mqtt: from config.yaml."
 fi
 
 opt MEDIA_FRIGATE_URL frigate_url
