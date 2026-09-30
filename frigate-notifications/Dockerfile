@@ -1,5 +1,5 @@
 # Bump SOURCE_VERSION with `version` in config.yaml.
-ARG SOURCE_VERSION=0.1.0
+ARG SOURCE_VERSION=0.2.0
 
 FROM ghcr.io/connorsapps/frigate-notifications:${SOURCE_VERSION} AS source
 

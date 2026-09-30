@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.0
+
+- frigate-notifications 0.2.0 ([changes](https://github.com/ConnorsApps/frigate-notifications/compare/v0.1.0...v0.2.0)).
+
 ## 0.1.2
 
 - Image labels Home Assistant needs to uninstall and repair the app cleanly.
