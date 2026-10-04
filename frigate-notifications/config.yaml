@@ -1,5 +1,5 @@
 name: Frigate Notifications
-version: "0.2.0"
+version: "0.3.0"
 slug: frigate_notifications
 description: Rule-based Frigate notifications via Home Assistant, Slack, ntfy, and Discord
 url: https://github.com/ConnorsApps/frigate-notifications

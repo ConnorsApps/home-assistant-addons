@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.0
+
+- frigate-notifications 0.3.0 ([changes](https://github.com/ConnorsApps/frigate-notifications/compare/v0.2.0...v0.3.0)).
+
 ## 0.2.0
 
 - frigate-notifications 0.2.0 ([changes](https://github.com/ConnorsApps/frigate-notifications/compare/v0.1.0...v0.2.0)).
